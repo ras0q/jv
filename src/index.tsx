@@ -1,8 +1,19 @@
 /* @refresh reload */
-import { render } from 'solid-js/web'
-import './index.css'
-import App from './App.tsx'
+/// <reference path="./types/file-system-access.d.ts" />
+import { render } from "solid-js/web";
+import App from "./App.tsx";
+import { MemoryJournalRepository } from "./infrastructure/memory-journal-repository.ts";
 
-const root = document.getElementById('root')
+const root = document.getElementById("root");
+const testFiles = globalThis.__JOURNAL_VIEWER_TEST_DATA__;
 
-render(() => <App />, root!)
+render(
+  () => (
+    <App
+      repository={testFiles
+        ? new MemoryJournalRepository(testFiles)
+        : undefined}
+    />
+  ),
+  root!,
+);
