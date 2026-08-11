@@ -14,15 +14,18 @@ export function ViewerHeader(props: ViewerHeaderProps) {
   return (
     <header class="app-header">
       <h1>Journal Viewer</h1>
+      <a
+        href="https://github.com/ras0q/jv"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        GitHub
+      </a>
       <p class="keyboard-help">
         j/k or ↑/↓: entries · h/l or ←/→: panes
       </p>
       <div class="header-actions">
         <button type="button" onClick={props.onRefresh}>Refresh</button>
-        <SettingsDialog
-          settings={props.settings}
-          onSave={props.onUpdateSettings}
-        />
         <button
           class="directory-button"
           type="button"
@@ -31,6 +34,10 @@ export function ViewerHeader(props: ViewerHeaderProps) {
         >
           {props.directoryName}
         </button>
+        <SettingsDialog
+          settings={props.settings}
+          onSave={props.onUpdateSettings}
+        />
       </div>
     </header>
   );
