@@ -42,3 +42,26 @@ Build production assets:
 ```bash
 deno task build
 ```
+
+## Deploy
+
+Authenticate Wrangler once:
+
+```bash
+deno run -A wrangler login
+```
+
+Build and deploy the static assets to `https://jv.ras0q.com` through Cloudflare
+Workers:
+
+```bash
+deno task deploy
+```
+
+Every push also runs checks, builds the application, and deploys it through
+GitHub Actions. Configure these repository secrets before enabling the workflow:
+
+- `CLOUDFLARE_ACCOUNT_ID`
+- `CLOUDFLARE_API_TOKEN`
+
+The API token should be limited to the account and zone used by this Worker.
