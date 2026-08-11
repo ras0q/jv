@@ -7,6 +7,8 @@ from the same month and day across three years.
 Journal content is processed entirely in the browser and is never sent
 elsewhere.
 
+![thumbnail](./thumb.png)
+
 ## Settings
 
 Open `Settings` in the viewer header to change:
