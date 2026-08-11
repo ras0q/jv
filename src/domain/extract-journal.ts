@@ -3,12 +3,15 @@ import type { JournalState } from "./journal.ts";
 
 export type ExtractedJournal = { journal: string; state: JournalState };
 
-/** Extracts a root-level Journal section from the exact source spans retained by block tokens. */
-export function extractJournal(source: string): ExtractedJournal {
+/** Extracts a named root-level h2 section from source spans retained by block tokens. */
+export function extractJournal(
+  source: string,
+  sectionHeading = "Journal",
+): ExtractedJournal {
   const tokens = lexer(source, { gfm: true });
   const startIndex = tokens.findIndex((token) =>
     token.type === "heading" && token.depth === 2 &&
-    token.text.trim() === "Journal"
+    token.text.trim() === sectionHeading
   );
 
   if (startIndex < 0) return { journal: "", state: "missing-section" };

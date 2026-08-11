@@ -14,7 +14,9 @@ export function JournalViewer(props: JournalViewerProps) {
     <div class="viewer">
       <ViewerHeader
         directoryName={props.directoryName}
+        settings={props.viewer.state.settings}
         onRefresh={props.viewer.refreshAll}
+        onUpdateSettings={props.viewer.updateSettings}
         onChooseDirectory={props.viewer.chooseDirectory}
       />
       <div class="panes">

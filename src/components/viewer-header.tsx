@@ -1,6 +1,11 @@
+import type { ViewerSettings } from "../domain/viewer-settings.ts";
+import { SettingsDialog } from "./settings-dialog.tsx";
+
 type ViewerHeaderProps = {
   directoryName: string;
+  settings: ViewerSettings;
   onRefresh: () => void;
+  onUpdateSettings: (settings: ViewerSettings) => void | Promise<void>;
   onChooseDirectory: () => void;
 };
 
@@ -14,6 +19,10 @@ export function ViewerHeader(props: ViewerHeaderProps) {
       </p>
       <div class="header-actions">
         <button type="button" onClick={props.onRefresh}>Refresh</button>
+        <SettingsDialog
+          settings={props.settings}
+          onSave={props.onUpdateSettings}
+        />
         <button
           class="directory-button"
           type="button"

@@ -85,3 +85,32 @@ test("loads, restores URL selection, and supports keyboard selection", async ({ 
   await detail.press("ArrowLeft");
   await expect(latest).toBeFocused();
 });
+
+test("updates and restores viewer settings", async ({ page }) => {
+  await page.addInitScript(() => {
+    globalThis.__JOURNAL_VIEWER_TEST_DATA__ = {
+      "2024-08-11": "## Notes\nEntry 2024",
+      "2025-08-11": "## Notes\nEntry 2025",
+      "2026-08-11": "## Notes\nEntry 2026",
+    };
+  });
+
+  await page.goto("/");
+  await expect(page.getByText("No recorded journals.")).toBeVisible();
+  await page.getByRole("button", { name: "Settings" }).click();
+
+  const dialog = page.getByRole("dialog", { name: "Settings" });
+  await dialog.getByLabel("Section heading").fill("Notes");
+  await dialog.getByLabel("Comparison years").fill("2");
+  await dialog.getByRole("button", { name: "Save" }).click();
+
+  await expect(page.locator('[data-journal-date="2026-08-11"]')).toBeVisible();
+  await expect(
+    page.getByLabel("Three-year journal").getByRole("heading", { level: 2 }),
+  ).toHaveCount(2);
+
+  await page.reload();
+  await page.getByRole("button", { name: "Settings" }).click();
+  await expect(dialog.getByLabel("Section heading")).toHaveValue("Notes");
+  await expect(dialog.getByLabel("Comparison years")).toHaveValue("2");
+});

@@ -29,3 +29,11 @@ Deno.test("extractJournal ignores headings inside code fences and quotes", () =>
     state: "recorded",
   });
 });
+
+Deno.test("extractJournal selects a configured section heading", () => {
+  const source = "## Journal\nDefault\n\n## Notes\nConfigured";
+  assertEquals(extractJournal(source, "Notes"), {
+    journal: "Configured",
+    state: "recorded",
+  });
+});

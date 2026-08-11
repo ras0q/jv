@@ -46,13 +46,13 @@ export class FileSystemJournalRepository implements JournalRepository {
     return [...new Set(dates)].sort((left, right) => right.localeCompare(left));
   }
 
-  async read(date: string): Promise<JournalEntry> {
+  async read(date: string, sectionHeading: string): Promise<JournalEntry> {
     if (!isValidDate(date)) throw new DailyNoteMissingError(date);
     try {
       const year = await this.handle.getDirectoryHandle(date.slice(0, 4));
       const fileHandle = await year.getFileHandle(`${date}.md`);
       const file = await fileHandle.getFile();
-      const extracted = extractJournal(await file.text());
+      const extracted = extractJournal(await file.text(), sectionHeading);
       return {
         date,
         path: `${date.slice(0, 4)}/${date}.md`,

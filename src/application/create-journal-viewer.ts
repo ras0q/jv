@@ -10,10 +10,18 @@ import {
   type ViewerState,
 } from "../domain/journal.ts";
 import {
+  normalizeViewerSettings,
+  type ViewerSettings,
+} from "../domain/viewer-settings.ts";
+import {
   loadDirectoryHandle,
   saveDirectoryHandle,
 } from "../infrastructure/directory-handle-store.ts";
 import { FileSystemJournalRepository } from "../infrastructure/file-system-journal-repository.ts";
+import {
+  loadViewerSettings,
+  saveViewerSettings,
+} from "../infrastructure/viewer-settings-store.ts";
 
 const BATCH_SIZE = 20;
 
@@ -35,6 +43,7 @@ function readableError(error: unknown): string {
  */
 export function createJournalViewer(repositoryOverride?: JournalRepository) {
   const [state, setState] = createStore<ViewerState>({
+    settings: loadViewerSettings(),
     connection: { type: "loading" },
     selectedDate: null,
     availableDates: [],
@@ -62,7 +71,7 @@ export function createJournalViewer(repositoryOverride?: JournalRepository) {
     const cached = state.journalCache.get(date);
     if (cached && !force) return cached;
     if (!repository) throw new Error("Repository unavailable");
-    const entry = await repository.read(date);
+    const entry = await repository.read(date, state.settings.sectionHeading);
     state.journalCache.set(date, entry);
     return entry;
   }
@@ -118,12 +127,15 @@ export function createJournalViewer(repositoryOverride?: JournalRepository) {
   async function loadDetails(date: string, force = false): Promise<void> {
     const selected = parseDate(date);
     if (!selected) return;
-    const targets = [0, 1, 2].map((offset): DetailItem => {
-      const target = subtractYears(date, offset);
-      return target
-        ? { type: "loading", date: target }
-        : { type: "invalid-date", year: selected.year - offset };
-    });
+    const targets = Array.from(
+      { length: state.settings.comparisonYears },
+      (_, offset): DetailItem => {
+        const target = subtractYears(date, offset);
+        return target
+          ? { type: "loading", date: target }
+          : { type: "invalid-date", year: selected.year - offset };
+      },
+    );
     setState("detailItems", targets);
 
     const loaded = await Promise.all(
@@ -305,6 +317,13 @@ export function createJournalViewer(repositoryOverride?: JournalRepository) {
     }
   }
 
+  async function updateSettings(value: ViewerSettings): Promise<void> {
+    const settings = normalizeViewerSettings(value);
+    setState("settings", settings);
+    saveViewerSettings(settings);
+    await refreshAll();
+  }
+
   async function retryFeedItem(date: string): Promise<void> {
     try {
       const entry = await readEntry(date, true);
@@ -404,6 +423,7 @@ export function createJournalViewer(repositoryOverride?: JournalRepository) {
     chooseDirectory,
     reconnect,
     refreshAll,
+    updateSettings,
     loadMore,
     retryFeedItem,
     retryDetails: () =>

@@ -1,3 +1,5 @@
+import type { ViewerSettings } from "./viewer-settings.ts";
+
 export type JournalState = "recorded" | "empty" | "missing-section";
 
 export type JournalEntry = {
@@ -32,6 +34,7 @@ export type DetailItem =
   | { type: "loading"; date: string };
 
 export type ViewerState = {
+  settings: ViewerSettings;
   connection: ConnectionState;
   selectedDate: string | null;
   availableDates: string[];
@@ -49,7 +52,7 @@ export interface JournalRepository {
   readonly handle: FileSystemDirectoryHandle | null;
   validate(): Promise<boolean>;
   listDates(): Promise<string[]>;
-  read(date: string): Promise<JournalEntry>;
+  read(date: string, sectionHeading: string): Promise<JournalEntry>;
 }
 
 export class DailyNoteMissingError extends Error {

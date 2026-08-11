@@ -74,7 +74,7 @@ Deno.test("repository lists valid files whose filename year matches the parent",
 });
 
 Deno.test("repository extracts an entry from a known path", async () => {
-  assertObjectMatch(await repository.read("2024-02-29"), {
+  assertObjectMatch(await repository.read("2024-02-29", "Journal"), {
     date: "2024-02-29",
     path: "2024/2024-02-29.md",
     journal: "Leap day",
@@ -84,7 +84,7 @@ Deno.test("repository extracts an entry from a known path", async () => {
 
 Deno.test("repository distinguishes a missing file", async () => {
   await assertRejects(
-    () => repository.read("2024-08-11"),
+    () => repository.read("2024-08-11", "Journal"),
     DailyNoteMissingError,
   );
 });

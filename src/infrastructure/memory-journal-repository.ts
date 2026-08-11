@@ -24,12 +24,12 @@ export class MemoryJournalRepository implements JournalRepository {
     );
   }
 
-  read(date: string): Promise<JournalEntry> {
+  read(date: string, sectionHeading: string): Promise<JournalEntry> {
     const source = this.files[date];
     if (source === undefined) {
       return Promise.reject(new DailyNoteMissingError(date));
     }
-    const extracted = extractJournal(source);
+    const extracted = extractJournal(source, sectionHeading);
     return Promise.resolve({
       date,
       path: `${date.slice(0, 4)}/${date}.md`,
